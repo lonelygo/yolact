@@ -492,6 +492,7 @@ class Detections:
 
         # Round to the nearest 10th to avoid huge file sizes, as COCO suggests
         bbox = [round(float(x) * 10) / 10 for x in bbox]
+        print(bbox)
 
         self.bbox_data.append({
             'image_id': int(image_id),
@@ -499,6 +500,7 @@ class Detections:
             'bbox': bbox,
             'score': float(score)
         })
+        print(self.bbox_data)
 
     def add_mask(self, image_id: int, category_id: int,
                  segmentation: np.ndarray, score: float):
@@ -508,12 +510,15 @@ class Detections:
         rle['counts'] = rle['counts'].decode(
             'ascii')  # json.dump doesn't like bytes strings
 
+        print(rle)
+
         self.mask_data.append({
             'image_id': int(image_id),
             'category_id': get_coco_cat(int(category_id)),
             'segmentation': rle,
             'score': float(score)
         })
+        print(self.mask_data)
 
     def dump(self):
         dump_arguments = [(self.bbox_data, args.bbox_det_file),
