@@ -294,7 +294,7 @@ def prep_display(dets_out,
                  w,
                  undo_transform=True,
                  class_color=False,
-                 mask_alpha=0.45,
+                 mask_alpha=0.9, # default value is 0.45
                  fps_str=''):
     """
     Note: If undo_transform=False then im_h and im_w are allowed to be None.
@@ -309,6 +309,7 @@ def prep_display(dets_out,
     with timer.env('Postprocess'):
         save = cfg.rescore_bbox
         cfg.rescore_bbox = True
+        # postprocess return: classes, scores, boxes, masks
         t = postprocess(dets_out,
                         w,
                         h,
@@ -325,11 +326,14 @@ def prep_display(dets_out,
             masks = t[3][idx]
         classes, scores, boxes = [x[idx].cpu().numpy() for x in t[:3]]
 
+        pring('copyed classes: {}, scores: {}, boxes:{}'.format(classes, scores, boxes))
+
     num_dets_to_consider = min(args.top_k, classes.shape[0])
     for j in range(num_dets_to_consider):
         if scores[j] < args.score_threshold:
             num_dets_to_consider = j
             break
+    print('num_dets_to_consider: ', num_dets_to_consider)
 
     # Quick and dirty lambda for selecting the color for a particular index
     # Also keeps track of a per-gpu color cache for maximum speed
@@ -355,6 +359,8 @@ def prep_display(dets_out,
     if args.display_masks and cfg.eval_mask_branch and num_dets_to_consider > 0:
         # After this, mask is of size [num_dets, h, w, 1]
         masks = masks[:num_dets_to_consider, :, :, None]
+
+        print('draw masks:', masks)
 
         # Prepare the RGB images for each mask given their color (size [num_dets, h, w, 1])
         colors = torch.cat([

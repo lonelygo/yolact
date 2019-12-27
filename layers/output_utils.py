@@ -62,14 +62,14 @@ def postprocess(det_output,
     scores = dets['score']
     masks = dets['mask']
 
-    # Just for test get image masks
-    img_out_masks = {
-        'class': classes,
-        'box': boxes,
-        'score': scores,
-        'mask': masks
-    }
-    print('dets:', img_out_masks)
+    #    # Just for test get image masks
+    #    img_out_masks = {
+    #        'class': classes,
+    #        'box': boxes,
+    #        'score': scores,
+    #        'mask': masks
+    #    }
+    #    print('dets:', img_out_masks)
 
     if cfg.mask_type == mask_type.lincomb and cfg.eval_mask_branch:
         # At this points masks is only the coefficients
@@ -110,7 +110,7 @@ def postprocess(det_output,
                               mode=interpolation_mode,
                               align_corners=False).squeeze(0)
 
-        print('Scale masks:', masks)
+        #        print('Scale masks:', masks)
 
         # Binarize the masks
         masks.gt_(0.5)
@@ -147,9 +147,8 @@ def postprocess(det_output,
             full_masks[jdx, y1:y2, x1:x2] = mask
 
         masks = full_masks
-        print('full_masks: ', masks)
 
-    print('final classes:{}, scores:{},boxes:{},masks:{}'.format(
+    print('final classes: {}, scores: {},boxes: {},masks: {}'.format(
         classes, scores, boxes, masks))
 
     return classes, scores, boxes, masks
