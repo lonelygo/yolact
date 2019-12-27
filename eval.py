@@ -1159,6 +1159,7 @@ def evaluate(net: Yolact, dataset, train_mode=False):
             'mask': [[APDataObject() for _ in cfg.dataset.class_names]
                      for _ in iou_thresholds]
         }
+        print(ap_data)
         detections = Detections()
         print(detections.mask_data)
         print(detections.bbox_data)
