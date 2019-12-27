@@ -294,7 +294,7 @@ def prep_display(dets_out,
                  w,
                  undo_transform=True,
                  class_color=False,
-                 mask_alpha=0.9, # default value is 0.45
+                 mask_alpha=1.0, # default value is 0.45
                  fps_str=''):
     """
     Note: If undo_transform=False then im_h and im_w are allowed to be None.
@@ -326,7 +326,7 @@ def prep_display(dets_out,
             masks = t[3][idx]
         classes, scores, boxes = [x[idx].cpu().numpy() for x in t[:3]]
 
-        pring('copyed classes: {}, scores: {}, boxes:{}'.format(classes, scores, boxes))
+        print('copyed classes: {}, scores: {}, boxes:{}'.format(classes, scores, boxes))
 
     num_dets_to_consider = min(args.top_k, classes.shape[0])
     for j in range(num_dets_to_consider):
@@ -368,7 +368,11 @@ def prep_display(dets_out,
             for j in range(num_dets_to_consider)
         ],
                            dim=0)
-        masks_color = masks.repeat(1, 1, 1, 3) * colors * mask_alpha
+        # masks_color = masks.repeat(1, 1, 1, 3) * colors * mask_alpha
+        # 上面的是原来代码，下面的纯属实验
+        new_colors = (0, 0, 0)
+        print(classes[0])
+        masks_color = masks.repeat(1, 1, 1, 3) * new_colors * mask_alpha
 
         # This is 1 everywhere except for 1-mask_alpha where the mask is
         inv_alph_masks = masks * (-mask_alpha) + 1
