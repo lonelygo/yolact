@@ -294,7 +294,7 @@ def prep_display(dets_out,
                  w,
                  undo_transform=True,
                  class_color=False,
-                 mask_alpha=1.0, # default value is 0.45
+                 mask_alpha=1.0,  # default value is 0.45
                  fps_str=''):
     """
     Note: If undo_transform=False then im_h and im_w are allowed to be None.
@@ -351,6 +351,7 @@ def prep_display(dets_out,
             if on_gpu is not None:
                 color = torch.Tensor(color).to(on_gpu).float() / 255.
                 color_cache[on_gpu][color_idx] = color
+            print('color:', color)
             return color
 
     # First, draw the masks on the GPU where we can do it really fast
@@ -360,7 +361,7 @@ def prep_display(dets_out,
         # After this, mask is of size [num_dets, h, w, 1]
         masks = masks[:num_dets_to_consider, :, :, None]
 
-        print('draw masks:', masks)
+        # print('draw masks:', masks)
 
         # Prepare the RGB images for each mask given their color (size [num_dets, h, w, 1])
         colors = torch.cat([
@@ -371,7 +372,7 @@ def prep_display(dets_out,
         masks_color = masks.repeat(1, 1, 1, 3) * colors * mask_alpha
         # 上面的是原来代码，下面的纯属实验
         # new_colors = (0, 0, 0)
-        print(classes[0])
+        # print(classes[0])
         # masks_color = masks.repeat(1, 1, 1, 3) * new_colors * mask_alpha
 
         # This is 1 everywhere except for 1-mask_alpha where the mask is
@@ -382,8 +383,7 @@ def prep_display(dets_out,
         #        img_gpu = img_gpu * inv_alph_masks[j] + masks_color[j]
         masks_color_summand = masks_color[0]
         if num_dets_to_consider > 1:
-            inv_alph_cumul = inv_alph_masks[:(num_dets_to_consider -
-                                              1)].cumprod(dim=0)
+            inv_alph_cumul = inv_alph_masks[:(num_dets_to_consider - 1)].cumprod(dim=0)
             masks_color_cumul = masks_color[1:] * inv_alph_cumul
             masks_color_summand += masks_color_cumul.sum(dim=0)
 
