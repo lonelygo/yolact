@@ -4,7 +4,7 @@ import torch
 
 # for making bounding boxes pretty
 COLORS = ((0, 0, 0),
-          (50, 50, 50))
+          (255, 255, 255))
 #COLORS = ((244,  67,  54),
 #          (233,  30,  99),
 #          (156,  39, 176),
@@ -660,6 +660,7 @@ yolact_base_config = coco_base_config.copy({
 
     # Dataset stuff
     'dataset': coco2017_dataset,
+    # +1 的意思应该是增加background这个类别吧？
     'num_classes': len(coco2017_dataset.class_names) + 1,
 
     # Image Size

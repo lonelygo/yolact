@@ -326,7 +326,11 @@ def prep_display(dets_out,
             masks = t[3][idx]
         classes, scores, boxes = [x[idx].cpu().numpy() for x in t[:3]]
 
-        print('copyed classes: {}, scores: {}, boxes:{}'.format(classes, scores, boxes))
+        # https://github.com/dbolya/yolact/issues/223 How to obtain person masks and output it separately when I predict an image
+        # https://github.com/dbolya/yolact/issues/75 Are you sure you need to explicitly train a background class? Wouldn't it be better to do something like
+        # bg = 1 - (pred_outs['segm'] > 0).float().max(dim=1)[0]
+
+        # print('copyed classes: {}, scores: {}, boxes:{}'.format(classes, scores, boxes))
 
     num_dets_to_consider = min(args.top_k, classes.shape[0])
     for j in range(num_dets_to_consider):
@@ -351,7 +355,9 @@ def prep_display(dets_out,
             if on_gpu is not None:
                 color = torch.Tensor(color).to(on_gpu).float() / 255.
                 color_cache[on_gpu][color_idx] = color
-            print('color:', color)
+            # color: tensor([0., 0., 0.]) -> (0,0,0)
+            # color: tensor([1., 1., 1.]) -> (255,255,255)
+            # print('color:', color)
             return color
 
     # First, draw the masks on the GPU where we can do it really fast
@@ -369,7 +375,15 @@ def prep_display(dets_out,
             for j in range(num_dets_to_consider)
         ],
                            dim=0)
-        masks_color = masks.repeat(1, 1, 1, 3) * colors * mask_alpha
+
+        # masks_color = masks.repeat(1, 1, 1, 3) * colors * mask_alpha
+        # 上面的是原来代码，下面的纯属实验
+        # COLORS 里面第一个是（0，0，0），colors[0]使所有对象都填充黑色。
+        for j in range(num_dets_to_consider):
+            if cfg.dataset.class_names[classes[j]] == 'person':
+                masks_color = masks.repeat(1, 1, 1, 3) * colors[0] * mask_alpha
+            else:
+                masks_color = masks.repeat(1, 1, 1, 3) * colors[1] * (1 - mask_alpha)
         # 上面的是原来代码，下面的纯属实验
         # new_colors = (0, 0, 0)
         # print(classes[0])
@@ -1382,6 +1396,8 @@ if __name__ == '__main__':
         print('Loading model...', end='')
         net = Yolact()
         net.load_weights(args.trained_model)
+
+        # net.eval() see this：https://pytorch.apachecn.org/docs/1.2/beginner/saving_loading_models.html?h=model.eval()
         net.eval()
         print(' Done.')
 
