@@ -337,7 +337,7 @@ def prep_display(dets_out,
         if scores[j] < args.score_threshold:
             num_dets_to_consider = j
             break
-    print('num_dets_to_consider: ', num_dets_to_consider)
+    # print('num_dets_to_consider: ', num_dets_to_consider)
 
     # Quick and dirty lambda for selecting the color for a particular index
     # Also keeps track of a per-gpu color cache for maximum speed
@@ -406,7 +406,9 @@ def prep_display(dets_out,
             masks_color_cumul = masks_color[1:] * inv_alph_cumul
             masks_color_summand += masks_color_cumul.sum(dim=0)
 
-        img_gpu = img_gpu * inv_alph_masks.prod(dim=0) + masks_color_summand
+        # img_gpu = img_gpu * inv_alph_masks.prod(dim=0) + masks_color_summand
+        #  上面为在原图上分割，下面为只输出蒙板
+        img_gpu = inv_alph_masks.prod(dim=0) + masks_color_summand
 
     if args.display_fps:
         # Draw the box for the fps on the GPU
@@ -1053,8 +1055,12 @@ def evalvideo(net: Yolact, path: str, out_path: str = None):
             import traceback
             traceback.print_exc()
 
-    extract_frame = lambda x, i: (x[0][i] if x[1][i] is None else x[0][i].to(x[
-        1][i]['detection']['box'].device), [x[1][i]])
+
+    # extract_frame = lambda x, i: (x[0][i] if x[1][i] is None else x[0][i].to(x[
+    #    1][i]['detection']['box'].device), [x[1][i]])
+    extract_frame = lambda x, i: (x[0][i] if x[1][i]['detection'] is None else
+                                  x[0][i].to(x[1][i]['detection']['box'].device
+                                             ), [x[1][i]])
 
     # Prime the network on the first frame because I do some thread unsafe things otherwise
     print('Initializing model... ', end='')
