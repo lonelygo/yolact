@@ -343,7 +343,10 @@ def prep_display(dets_out,
     # Also keeps track of a per-gpu color cache for maximum speed
     def get_color(j, on_gpu=None):
         global color_cache
-        color_idx = (classes[j] * 5 if class_color else j * 5) % len(COLORS)
+        # color_idx = (classes[j] * 5 if class_color else j * 5) % len(COLORS)
+        # 上面是与原来的，下面是简单处理颜色获取逻辑。
+        # color_idx = (classes[j] * 5 if class_color else j * 5) % len(COLORS)
+        color_idx = 0 if classes[j] == 0 else 1
 
         if on_gpu is not None and color_idx in color_cache[on_gpu]:
             return color_cache[on_gpu][color_idx]
@@ -381,9 +384,7 @@ def prep_display(dets_out,
         # COLORS 里面第一个是（0，0，0），colors[0]使所有对象都填充黑色。
         for j in range(num_dets_to_consider):
             if cfg.dataset.class_names[classes[j]] == 'person':
-                print('label:', cfg.dataset.class_names[classes[j]])
                 masks_color = masks.repeat(1, 1, 1, 3) * colors[0] * mask_alpha
-                print('color:', masks_color)
             # else:
             #     print('else label:', cfg.dataset.class_names[classes[j]])
             #     # masks_color = masks.repeat(1, 1, 1, 3) * colors[1] * mask_alpha

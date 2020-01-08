@@ -148,8 +148,8 @@ def postprocess(det_output,
 
         masks = full_masks
 
-    print('final classes: {}, scores: {},boxes: {},masks: {}'.format(
-        classes, scores, boxes, masks))
+    # print('final classes: {}, scores: {},boxes: {},masks: {}'.format(
+    #     classes, scores, boxes, masks))
 
     return classes, scores, boxes, masks
 
