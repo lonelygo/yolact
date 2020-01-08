@@ -381,9 +381,13 @@ def prep_display(dets_out,
         # COLORS 里面第一个是（0，0，0），colors[0]使所有对象都填充黑色。
         for j in range(num_dets_to_consider):
             if cfg.dataset.class_names[classes[j]] == 'person':
+                print('label:', cfg.dataset.class_names[classes[j]])
                 masks_color = masks.repeat(1, 1, 1, 3) * colors[0] * mask_alpha
-            else:
-                masks_color = masks.repeat(1, 1, 1, 3) * colors[1] * (1 - mask_alpha)
+                print('color:', masks_color)
+            # else:
+            #     print('else label:', cfg.dataset.class_names[classes[j]])
+            #     # masks_color = masks.repeat(1, 1, 1, 3) * colors[1] * mask_alpha
+            #     print('else color:', masks_color)
         # 上面的是原来代码，下面的纯属实验
         # new_colors = (0, 0, 0)
         # print(classes[0])
