@@ -344,7 +344,7 @@ def prep_display(dets_out,
     def get_color(j, on_gpu=None):
         global color_cache
         # color_idx = (classes[j] * 5 if class_color else j * 5) % len(COLORS)
-        # 上面是与原来的，下面是简单处理颜色获取逻辑。
+        # 上面是与原来的，下面是简单处理颜色获取逻辑，分类为0 一个颜色，其余一个颜色。
         # color_idx = (classes[j] * 5 if class_color else j * 5) % len(COLORS)
         color_idx = 0 if classes[j] == 0 else 1
 
@@ -376,19 +376,19 @@ def prep_display(dets_out,
         colors = torch.cat([
             get_color(j, on_gpu=img_gpu.device.index).view(1, 1, 1, 3)
             for j in range(num_dets_to_consider)
+            # 不能这么干，会让teensor size 不同。
+            # if cfg.dataset.class_names[classes[j]] == 'person'
         ],
                            dim=0)
+        # 上面的代码改写。
 
-        # masks_color = masks.repeat(1, 1, 1, 3) * colors * mask_alpha
+        masks_color = masks.repeat(1, 1, 1, 3) * colors * mask_alpha
         # 上面的是原来代码，下面的纯属实验
         # COLORS 里面第一个是（0，0，0），colors[0]使所有对象都填充黑色。
-        for j in range(num_dets_to_consider):
-            if cfg.dataset.class_names[classes[j]] == 'person':
-                masks_color = masks[j].repeat(1, 1, 1, 3) * colors[0] * mask_alpha
-            # else:
-            #     print('else label:', cfg.dataset.class_names[classes[j]])
-            #     # masks_color = masks.repeat(1, 1, 1, 3) * colors[1] * mask_alpha
-            #     print('else color:', masks_color)
+        # for j in range(num_dets_to_consider):
+        #     if cfg.dataset.class_names[classes[j]] == 'person':
+        #         masks_color = masks[j].repeat(1, 1, 1, 3) * colors[0] * mask_alpha
+
         # 上面的是原来代码，下面的纯属实验
         # new_colors = (0, 0, 0)
         # print(classes[0])
