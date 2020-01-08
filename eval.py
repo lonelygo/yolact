@@ -384,7 +384,7 @@ def prep_display(dets_out,
         # COLORS 里面第一个是（0，0，0），colors[0]使所有对象都填充黑色。
         for j in range(num_dets_to_consider):
             if cfg.dataset.class_names[classes[j]] == 'person':
-                masks_color = masks.repeat(1, 1, 1, 3) * colors[0] * mask_alpha
+                masks_color = masks[j].repeat(1, 1, 1, 3) * colors[0] * mask_alpha
             # else:
             #     print('else label:', cfg.dataset.class_names[classes[j]])
             #     # masks_color = masks.repeat(1, 1, 1, 3) * colors[1] * mask_alpha
